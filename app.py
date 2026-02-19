@@ -6,14 +6,21 @@ import datetime
 import re
 import requests
 
-# --- 0. STATE MANAGEMENT (Prevents NameErrors) ---
+# --- 0. STATE MANAGEMENT ---
 def init_state(key, default_val):
     if key not in st.session_state:
         st.session_state[key] = default_val
 
+# Initialize Defaults
+init_state('hero_h', "Stop Paying Rent for Your Website.")
+init_state('hero_sub', "The Titan Engine is the world’s first 0.1s website architecture that runs on $0 monthly fees. Pay once. Own it forever.")
+init_state('about_h', "Control Your Empire")
+init_state('about_short', "No WordPress dashboard. No plugins to update. Just open your private Google Sheet, change a text, and watch your site update globally in seconds.")
+init_state('feat_data', "bolt | The Performance Pillar | **0.1s High-Velocity Loading**. While traditional sites take 3–5s, Titan loads instantly.\nwallet | The Economic Pillar | **$0 Monthly Fees**. We eliminated hosting subscriptions.\ntable | The Functional Pillar | **Google Sheets CMS**. Update prices and photos directly from a simple spreadsheet.\nshield | The Authority Pillar | **Unhackable Security**. Zero-DB Architecture removes the hacker's primary entry point.\nlayers | The Reliability Pillar | **Global Edge Deployment**. Distributed across 100+ servers worldwide.\nstar | The Conversion Pillar | **One-Tap WhatsApp**. Direct-to-Chat technology.")
+
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v39.0 | Ultimate Stable", 
+    page_title="Titan v39.1 | Stable Core", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -40,7 +47,7 @@ st.markdown("""
 # --- 3. SIDEBAR ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v39.0 | No Errors Edition")
+    st.caption("v39.1 | Error-Free Build")
     st.divider()
     
     # AI GENERATOR
@@ -108,15 +115,8 @@ with st.sidebar:
         og_image = st.text_input("Social Share Image URL")
 
 # --- 4. INPUT TABS ---
-st.title("🏗️ StopWebRent Site Builder v39.0")
+st.title("🏗️ StopWebRent Site Builder v39.1")
 tabs = st.tabs(["1. Identity", "2. Content", "3. Marketing", "4. Pricing", "5. Store", "6. Booking", "7. Blog", "8. Legal"])
-
-# INITIALIZE SESSION STATE DEFAULTS
-init_state('hero_h', "Stop Paying Rent for Your Website.")
-init_state('hero_sub', "The Titan Engine is the world’s first 0.1s website architecture that runs on $0 monthly fees.")
-init_state('about_h', "Control Your Empire")
-init_state('about_short', "No WordPress dashboard. Just open your private Google Sheet.")
-init_state('feat_data', "bolt | Speed | 0.1s Load Time\nwallet | Cost | $0 Monthly\ntable | CMS | Google Sheets\nshield | Secure | Zero-DB")
 
 with tabs[0]:
     c1, c2 = st.columns(2)
@@ -311,7 +311,7 @@ def get_theme_css():
     /* PRODUCT CARDS (APPLE STYLE) */
     .product-card {{ background: white; border-radius: 16px; overflow: hidden; transition: 0.4s; display: flex; flex-direction: column; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }}
     .product-card:hover {{ transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }}
-    .prod-img {{ width: 100%; height: 250px; object-fit: cover; background: #f1f5f9; }}
+    .prod-img {{ width: 100%; height: 280px; object-fit: cover; background: #f1f5f9; }}
     .card-content {{ padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }}
     /* Force Dark Text for Product Cards specifically if card bg is white */
     .product-card h3 {{ color: #1e293b !important; font-size: 1.25rem; }}
@@ -363,18 +363,23 @@ def gen_common_js():
     clean_wa = wa_num.replace("+", "").replace(" ", "")
     return f"""
     <script>
+    // SCROLL ANIMATION
     window.addEventListener('scroll', () => {{
         document.querySelectorAll('.reveal').forEach(r => {{
             if(r.getBoundingClientRect().top < window.innerHeight - 80) r.classList.add('active');
         }});
     }});
+    
+    // MENU & LANG
     function toggleMenu() {{ document.querySelector('.nav-links').classList.toggle('active'); }}
+    
     async function toggleLang() {{
         try {{
             const res = await fetch('{lang_sheet}');
             const txt = await res.text();
             const rows = txt.split(/\\r\\n|\\n/);
             rows.forEach(row => {{
+                // Robust CSV Split
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                 if(cols && cols.length >= 2) {{
                     const id = cols[0].replace(/"/g, '').trim();
@@ -383,6 +388,7 @@ def gen_common_js():
                     if(el) el.innerText = text;
                 }}
             }});
+            // Toast
             const t = document.createElement('div');
             t.innerText = "Language Switched 🌐";
             t.style.cssText = "position:fixed; top:80px; right:20px; background:var(--s); color:white; padding:10px 20px; border-radius:8px; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.2);";
@@ -390,6 +396,8 @@ def gen_common_js():
             setTimeout(() => t.remove(), 2500);
         }} catch(e) {{ console.log("Lang Error", e); }}
     }}
+    
+    // CART
     let cart = JSON.parse(localStorage.getItem('titanCart')) || [];
     function addToCart(name, price) {{
         cart.push({{name, price}});
@@ -408,15 +416,186 @@ def gen_common_js():
         window.open(`https://wa.me/{clean_wa}?text=${{msg}}`, '_blank');
         cart = []; localStorage.setItem('titanCart', '[]'); updateCartDisplay();
     }}
+    
+    // POPUP
     setTimeout(() => {{
         if(!localStorage.getItem('popShown') && document.getElementById('lead-popup')) {{
             document.getElementById('lead-popup').style.display = 'block';
             localStorage.setItem('popShown', 'true');
         }}
     }}, {popup_delay * 1000});
+
     window.addEventListener('load', updateCartDisplay);
     </script>
     """
+
+def get_simple_icon(name):
+    name = name.lower().strip()
+    path = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+    if "bolt" in name: path = "M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"
+    if "wallet" in name: path = "M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+    return f'<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="{path}"/></svg>'
+
+# --- CONTENT GENERATORS (DEFINED TO PREVENT NAME ERROR) ---
+
+def gen_hero():
+    bg_media = f"""
+    <div class="carousel-slide active" style="background-image: url('{hero_img_1}')"></div>
+    <div class="carousel-slide" style="background-image: url('{hero_img_2}')"></div>
+    <div class="carousel-slide" style="background-image: url('{hero_img_3}')"></div>
+    <script>
+        let slides = document.querySelectorAll('.carousel-slide');
+        let currentSlide = 0;
+        setInterval(() => {{
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }}, 4000);
+    </script>
+    """
+    
+    if hero_video_id:
+        bg_media = f"""
+        <iframe src="https://www.youtube.com/embed/{hero_video_id}?autoplay=1&mute=1&loop=1&playlist={hero_video_id}&controls=0&showinfo=0&rel=0" 
+        style="position:absolute; top:50%; left:50%; width:100vw; height:100vh; transform:translate(-50%, -50%); pointer-events:none; object-fit:cover; z-index:0; min-width:177.77vh; min-height:56.25vw;" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+        """
+
+    return f"""
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        {bg_media}
+        <div class="container hero-content">
+            <h1 id="hero-title">{hero_h}</h1>
+            <p id="hero-sub">{hero_sub}</p>
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; {'justify-content:center;' if hero_layout == 'Center' else ''}">
+                <a href="#inventory" class="btn btn-accent" id="btn-explore">Explore Now</a>
+                <a href="contact.html" class="btn" style="background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); color:white;" id="btn-contact">Contact Us</a>
+            </div>
+        </div>
+    </section>
+    """
+
+def gen_features():
+    cards = ""
+    lines = [x for x in feat_data_input.split('\n') if x.strip()]
+    for line in lines:
+        parts = line.split('|')
+        if len(parts) >= 3:
+            cards += f"""<div class="card reveal"><div style="color:var(--s); margin-bottom:1rem;">{get_simple_icon(parts[0])}</div><h3>{parts[1].strip()}</h3><div>{format_text(parts[2].strip())}</div></div>"""
+    return f"""<section id="features"><div class="container"><div class="section-head reveal"><h2 id="feature-title">{f_title}</h2></div><div class="grid-3">{cards}</div></div></section>"""
+
+def gen_stats():
+    return f"""
+    <div style="background:var(--p); color:white; padding:3rem 0; text-align:center;">
+        <div class="container grid-3">
+            <div class="reveal"><h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_1}</h3><p style="color:rgba(255,255,255,0.7);" id="stat-label-1">{label_1}</p></div>
+            <div class="reveal"><h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_2}</h3><p style="color:rgba(255,255,255,0.7);" id="stat-label-2">{label_2}</p></div>
+            <div class="reveal"><h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_3}</h3><p style="color:rgba(255,255,255,0.7);" id="stat-label-3">{label_3}</p></div>
+        </div>
+    </div>
+    """
+
+def gen_pricing_table():
+    if not show_pricing: return ""
+    return f"""
+    <section id="pricing"><div class="container">
+        <div class="section-head reveal"><h2 id="pricing-title">Pricing</h2></div>
+        <div class="pricing-wrapper reveal">
+            <table class="pricing-table">
+                <thead>
+                    <tr><th style="width:40%" id="col-expense">Expense Category</th><th style="background:var(--s);" id="col-titan">Titan</th><th id="col-comp">{wix_name}</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Initial Setup Fee</td><td><strong>{titan_price}</strong></td><td>$0</td></tr>
+                    <tr><td>Annual Costs</td><td><strong>{titan_mo}</strong></td><td>{wix_mo}</td></tr>
+                    <tr><td><strong>5-Year Savings</strong></td><td style="color:var(--s); font-size:1.3rem;">You Save {save_val}</td><td>$0</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div></section>
+    """
+
+def gen_inventory_js(is_demo=False):
+    demo_flag = "const isDemo = true;" if is_demo else "const isDemo = false;"
+    return f"""
+    {gen_csv_parser()}
+    <script>
+    {demo_flag}
+    async function loadInv() {{
+        try {{
+            const res = await fetch('{sheet_url}'); const txt = await res.text(); const lines = txt.split(/\\r\\n|\\n/);
+            const box = document.getElementById('inv-grid'); if(!box) return; box.innerHTML = '';
+            for(let i=1; i<lines.length; i++) {{
+                if(!lines[i].trim()) continue;
+                const c = parseCSVLine(lines[i]);
+                let img = c[3] && c[3].length > 5 ? c[3] : '{custom_feat}';
+                let stripe = (c.length > 4 && c[4].includes('http')) ? c[4] : '';
+                if(c.length > 1) {{
+                    let btn = stripe ? `<a href="${{stripe}}" class="btn btn-primary" style="width:100%;">Buy Now</a>` : `<button onclick="addToCart('${{c[0]}}', '${{c[1]}}')" class="btn" style="width:100%;">Add to Cart</button>`;
+                    box.innerHTML += `<div class="card reveal"><img src="${{img}}" class="prod-img" loading="lazy"><div><h3>${{c[0]}}</h3><p style="font-weight:bold; color:var(--s);">${{c[1]}}</p><p style="font-size:0.9rem; opacity:0.8;">${{c[2]}}</p>${{btn}}</div></div>`;
+                }}
+            }}
+        }} catch(e) {{ console.log(e); }}
+    }}
+    if(document.getElementById('inv-grid')) window.addEventListener('load', loadInv);
+    </script>
+    """
+
+def gen_inventory():
+    if not show_inventory: return ""
+    return f"""<section id="inventory" style="background:rgba(0,0,0,0.02)"><div class="container"><div class="section-head reveal"><h2 id="store-title">Store</h2></div><div id="inv-grid" class="grid-3"><div>Loading...</div></div></div></section>{gen_inventory_js(is_demo=False)}"""
+
+def gen_about_section():
+    return f"""<section id="about"><div class="container"><div class="about-grid"><div class="reveal"><h2 id="about-title">{about_h_in}</h2><div>{format_text(about_short_in)}</div><a href="about.html" class="btn btn-primary" id="about-btn">Read More</a></div><img src="{about_img}" class="reveal" style="width:100%; border-radius:var(--radius);"></div></div></section>"""
+
+def gen_faq_section():
+    items = "".join([f"<details class='reveal'><summary>{l.split('?')[0]}?</summary><p>{l.split('?')[1]}</p></details>" for l in faq_data.split('\n') if "?" in l])
+    return f"""<section id="faq"><div class="container" style="max-width:800px;"><div class="section-head reveal"><h2 id="faq-title">Frequently Asked Questions</h2></div>{items}</div></section>"""
+
+def gen_footer():
+    icons = ""
+    if fb_link: icons += f'<a href="{fb_link}" target="_blank" style="display:inline-block; margin-right:15px;"><svg class="social-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>'
+    if ig_link: icons += f'<a href="{ig_link}" target="_blank" style="display:inline-block; margin-right:15px;"><svg class="social-icon" viewBox="0 0 24 24"><path d="M16.98 0a6.9 6.9 0 0 1 5.08 1.98A6.94 6.94 0 0 1 24 7.02v9.96c0 2.08-.68 3.87-1.98 5.13A7.14 7.14 0 0 1 16.94 24H7.06a7.06 7.06 0 0 1-5.03-1.89A6.96 6.96 0 0 1 0 16.94V7.02C0 2.8 2.8 0 7.02 0h9.96zM7.17 2.1c-1.4 0-2.6.48-3.46 1.33c-.85.85-1.33 2.06-1.33 3.46v10.3c0 1.3.47 2.5 1.33 3.36c.86.85 2.06 1.33 3.46 1.33h9.66c1.4 0 2.6-.48 3.46-1.33c.85-.85 1.33-2.06 1.33-3.46V6.89c0-1.4-.47-2.6-1.33-3.46c-.86-.85-2.06-1.33-3.46-1.33H7.17zm11.97 3.33c.77 0 1.4.63 1.4 1.4c0 .77-.63 1.4-1.4 1.4c-.77 0-1.4-.63-1.4-1.4c0-.77.63-1.4 1.4-1.4zM12 5.76c3.39 0 6.14 2.75 6.14 6.14c0 3.39-2.75 6.14-6.14 6.14c-3.39 0-6.14-2.75-6.14-6.14c0-3.39 2.75-6.14 6.14-6.14zm0 2.1c-2.2 0-3.99 1.79-3.99 4.04c0 2.25 1.79 4.04 3.99 4.04c2.2 0 3.99-1.79 3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04c0-2.25-1.79-4.04-3.99-4.04z"/></svg></a>'
+    if x_link: icons += f'<a href="{x_link}" target="_blank" style="display:inline-block; margin-right:15px;"><svg class="social-icon" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584l-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg></a>'
+    if li_link: icons += f'<a href="{li_link}" target="_blank" style="display:inline-block; margin-right:15px;"><svg class="social-icon" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2a2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2a2 2 0 0 1 2-2z"></path></svg></a>'
+    if yt_link: icons += f'<a href="{yt_link}" target="_blank" style="display:inline-block; margin-right:15px;"><svg class="social-icon" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>'
+
+    return f"""
+    <footer><div class="container">
+        <div class="footer-grid">
+            <div>
+                <h3 style="color:white; margin-bottom:1.5rem;">{biz_name}</h3>
+                <p style="color:rgba(255,255,255,0.7); opacity:1;">{biz_addr}</p>
+                <div style="margin-top:1.5rem;">{icons}</div>
+            </div>
+            <div>
+                <h4 style="color:white; text-transform:uppercase;">Links</h4>
+                <a href="index.html" style="color:white!important; display:block; margin-bottom:0.5rem;" id="footer-home">Home</a>
+                <a href="blog.html" style="color:white!important; display:block; margin-bottom:0.5rem;" id="footer-blog">Blog</a>
+                <a href="booking.html" style="color:white!important; display:block; margin-bottom:0.5rem;" id="footer-book">Book Now</a>
+            </div>
+            <div>
+                <h4 style="color:white; text-transform:uppercase;">Legal</h4>
+                <a href="privacy.html" style="color:white!important; display:block; margin-bottom:0.5rem;">Privacy</a>
+                <a href="terms.html" style="color:white!important; display:block; margin-bottom:0.5rem;">Terms</a>
+            </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:3rem; padding-top:2rem; text-align:center; color:rgba(255,255,255,0.5);">
+            &copy; 2026 {biz_name}. Powered by Titan Engine.
+        </div>
+    </div></footer>
+    """
+
+def gen_wa_widget():
+    if not wa_num: return ""
+    clean_wa = wa_num.replace("+", "").replace(" ", "").replace("-", "")
+    return f"""<a href="https://wa.me/{clean_wa}" class="wa-float" target="_blank" style="position:fixed; bottom:30px; right:30px; background:#25d366; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(37,211,102,0.4); z-index:9999;"><svg style="width:32px;height:32px" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23c-1.48 0-2.93-.39-4.19-1.15l-.3-.17l-3.12.82l.83-3.04l-.2-.32a8.188 8.188 0 0 1-1.26-4.38c.01-4.54 3.7-8.24 8.25-8.24m-3.53 3.16c-.13 0-.35.05-.54.26c-.19.2-.72.7-.72 1.72s.73 2.01.83 2.14c.1.13 1.44 2.19 3.48 3.07c.49.21.87.33 1.16.43c.49.16.94.13 1.29.08c.4-.06 1.21-.5 1.38-.98c.17-.48.17-.89.12-.98c-.05-.09-.18-.13-.37-.23c-.19-.1-.1.13-.1.13s-1.13-.56-1.32-.66c-.19-.1-.32-.15-.45.05c-.13.2-.51.65-.62.78c-.11.13-.23.15-.42.05c-.19-.1-.8-.3-1.53-.94c-.57-.5-1.02-1.12-1.21-1.45c-.11-.19-.01-.29.09-.38c.09-.08.19-.23.29-.34c.1-.11.13-.19.19-.32c.06-.13.03-.24-.01-.34c-.05-.1-.45-1.08-.62-1.48c-.16-.4-.36-.34-.51-.35c-.11-.01-.25-.01-.4-.01Z"/></path></svg></a>"""
+
+def gen_scripts():
+    return """<script>
+    window.addEventListener('scroll', () => { var r = document.querySelectorAll('.reveal'); for (var i = 0; i < r.length; i++) { if (r[i].getBoundingClientRect().top < window.innerHeight - 100) r[i].classList.add('active'); } });
+    window.dispatchEvent(new Event('scroll'));
+    </script>"""
 
 # --- PAGE GENERATOR HELPER ---
 def build_page(title, content):
@@ -501,6 +680,7 @@ def gen_blog_post_html():
                                 <a href="https://www.facebook.com/sharer/sharer.php?u=${{url}}" target="_blank" class="share-btn bg-fb"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
                                 <a href="https://twitter.com/intent/tweet?text=${{title}}&url=${{url}}" target="_blank" class="share-btn bg-x"><svg viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584l-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a>
                                 <a href="https://www.linkedin.com/sharing/share-offsite/?url=${{url}}" target="_blank" class="share-btn bg-li"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2a2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2a2 2 0 0 1 2-2z"/></svg></a>
+                                <a href="https://www.reddit.com/submit?url=${{url}}&title=${{title}}" target="_blank" class="share-btn bg-rd"><svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></a>
                                 <a href="https://wa.me/?text=${{title}} ${{url}}" target="_blank" class="share-btn bg-wa"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a>
                                 <button onclick="navigator.clipboard.writeText(window.location.href);alert('Copied')" class="share-btn bg-link">🔗</button>
                             </div>
@@ -578,13 +758,6 @@ def gen_booking_content():
     <section class="hero" style="min-height:40vh; background:var(--p);"><div class="container hero-content"><h1 id="book-title">{booking_title}</h1><p id="book-sub">{booking_desc}</p></div></section>
     <section><div class="container" style="text-align:center;"><div style="background:white; border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.1);">{booking_embed}</div></div></section>
     """
-
-def get_simple_icon(name):
-    name = name.lower().strip()
-    path = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-    if "bolt" in name: path = "M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"
-    if "wallet" in name: path = "M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
-    return f'<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="{path}"/></svg>'
 
 # --- 6. LAUNCHPAD ---
 c1, c2 = st.columns([3, 1])
