@@ -1,11 +1,11 @@
 import streamlit as st
+import streamlit.components.v1 as components # <--- CRITICAL FIX
 import zipfile
 import io
 import json
 import datetime
 import re
 import requests
-import streamlit.components.v1 as components
 
 # --- 0. STATE MANAGEMENT ---
 def init_state(key, default_val):
@@ -20,7 +20,7 @@ init_state('feat_data', "bolt | The Performance Pillar | **0.1s High-Velocity Lo
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v40.2 | Stable Release", 
+    page_title="Titan v40.4 | Stable", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -29,10 +29,10 @@ st.set_page_config(
 # --- 2. SIDEBAR ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v40.2 | Final Fixed Build")
+    st.caption("v40.4 | Verified Build")
     st.divider()
     
-    # AI
+    # AI GENERATOR
     with st.expander("🤖 Titan AI Generator", expanded=False):
         groq_key = st.text_input("Groq API Key", type="password")
         biz_desc = st.text_input("Business Description")
@@ -82,7 +82,7 @@ with st.sidebar:
         gsc_tag = st.text_input("Google Verification")
         og_image = st.text_input("Social Share Image")
 
-# --- 3. INPUTS ---
+# --- 3. INPUT TABS ---
 st.title("🏗️ StopWebRent Site Builder")
 tabs = st.tabs(["1. Identity", "2. Content", "3. Pricing", "4. Store", "5. Booking", "6. Blog", "7. Legal"])
 
@@ -150,14 +150,12 @@ with tabs[3]:
 with tabs[4]:
     booking_embed = st.text_area("Calendly Embed", height=100)
     booking_title = st.text_input("Book Title", "Book Now")
-    # FIX: Added missing variable
-    booking_desc = st.text_area("Booking Description", "Schedule a time with our experts.") 
+    booking_desc = st.text_input("Book Subtext", "Select a slot.")
 
 with tabs[5]:
     blog_sheet_url = st.text_input("Blog CSV")
     blog_hero_title = st.text_input("Blog Title", "Insights")
-    # FIX: Added missing variable
-    blog_hero_sub = st.text_input("Blog Subtitle", "Latest news and updates from the team.")
+    blog_hero_sub = st.text_input("Blog Subtext", "News.")
 
 with tabs[6]:
     testi_data = st.text_area("Testimonials", "Name | Quote", height=100)
@@ -227,14 +225,18 @@ def gen_csv_parser():
     """
 
 def get_theme_css():
-    bg, txt, card, nav = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
-    if "Midnight" in theme_mode: bg, txt, card, nav = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
+    # --- VARIABLE NAME FIX ---
+    bg_c, txt_c, card_c, nav_c = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
+    if "Midnight" in theme_mode: bg_c, txt_c, card_c, nav_c = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
+    if "Cyberpunk" in theme_mode: bg_c, txt_c, card_c, nav_c = "#050505", "#00ff9d", "rgba(10,10,10,0.9)", "rgba(0,0,0,0.9)"
+    if "Luxury" in theme_mode: bg_c, txt_c, card_c, nav_c = "#101010", "#D4AF37", "rgba(20,20,20,0.9)", "rgba(0,0,0,0.9)"
+    if "Stark" in theme_mode: bg_c, txt_c, card_c, nav_c = "#ffffff", "#000000", "#ffffff", "rgba(255,255,255,1)"
     
     anim_css = ".reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; } .reveal.active { opacity: 1; transform: translateY(0); }"
     if anim_type == "None": anim_css = ""
 
     return f"""
-    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg}; --txt: {txt}; --card: {card}; --nav: {nav}; --radius: {border_rad}; --h-font: '{h_font}', sans-serif; --b-font: '{b_font}', sans-serif; }}
+    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg_c}; --txt: {txt_c}; --card: {card_c}; --nav: {nav_c}; --radius: {border_rad}; }}
     * {{ box-sizing: border-box; }}
     html {{ scroll-behavior: smooth; font-size: 16px; }}
     body {{ background-color: var(--bg); color: var(--txt); font-family: var(--b-font); margin: 0; line-height: 1.6; overflow-x: hidden; }}
@@ -610,67 +612,10 @@ def gen_product_page_content(is_demo=False):
 def gen_inner_header(title):
     return f"""<section class="hero" style="min-height: 40vh; background:var(--p);"><div class="container"><h1>{title}</h1></div></section>"""
 
-# --- FIX: THE MISSING ASSEMBLER FUNCTION ---
-def build_page(title, content):
-    # 1. Fonts Link
-    fonts_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@400;700&family=Oswald&family=Open+Sans&family=Roboto&family=Space+Grotesk&display=swap"
-    
-    # 2. Navigation Construction
-    nav_links_html = f"""<a href="index.html">Home</a>"""
-    if show_pricing: nav_links_html += f"""<a href="#pricing">Pricing</a>"""
-    if show_inventory: nav_links_html += f"""<a href="product.html">Store</a>"""
-    if show_blog: nav_links_html += f"""<a href="blog.html">Blog</a>"""
-    nav_links_html += f"""<a href="contact.html">Contact</a>"""
-    
-    # 3. HTML Skeleton
-    return f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{title} | {biz_name}</title>
-        <meta name="description" content="{seo_d}">
-        <link href="{fonts_url}" rel="stylesheet">
-        <style>{get_theme_css()}</style>
-        {gen_schema()}
-    </head>
-    <body>
-        <nav>
-            <div class="container nav-flex">
-                <a href="index.html" style="font-size:1.5rem; font-weight:bold; text-decoration:none; color:var(--txt);">{biz_name}</a>
-                <div class="mobile-menu" onclick="toggleMenu()">☰</div>
-                <div class="nav-links">
-                    {nav_links_html}
-                    <div style="display:inline-block; margin-left:2rem; cursor:pointer;" onclick="toggleCart()">
-                        🛒 <span id="cart-count" style="background:var(--s); color:white; padding:2px 6px; border-radius:50%; font-size:0.8rem;">0</span>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <!-- Cart Modal -->
-        <div id="cart-overlay" onclick="toggleCart()"></div>
-        <div id="cart-modal">
-            <h3>Your Cart</h3>
-            <div id="cart-items"></div>
-            <div style="margin-top:1rem; border-top:1px solid #eee; padding-top:1rem; display:flex; justify-content:space-between; font-weight:bold;">
-                <span>Total</span>
-                <span id="cart-total">0.00</span>
-            </div>
-            <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="checkoutWhatsApp()">Checkout on WhatsApp</button>
-        </div>
-        <div id="cart-float" onclick="checkoutWhatsApp()" style="display:none;">
-            <span>💬 Checkout</span>
-        </div>
-
-        {content}
-        
-        {gen_footer()}
-        {gen_common_js()}
-    </body>
-    </html>
-    """
+def build_page(title, content, extra_js=""):
+    css = get_theme_css()
+    meta = f'<link rel="manifest" href="manifest.json"><meta name="theme-color" content="{p_color}">'
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{title} | {biz_name}</title>{meta}{gen_schema()}<link href="https://fonts.googleapis.com/css2?family={h_font.replace(' ','+')}:wght@400;700;900&family={b_font.replace(' ','+')}:wght@300;400;600&display=swap" rel="stylesheet"><style>{css}</style></head><body>{gen_nav()}{content}{gen_footer()}{gen_wa_widget()}{gen_cart_system()}{gen_common_js()}{gen_sw()}{extra_js}</body></html>"""
 
 # --- 6. ASSEMBLE HOME ---
 home_content = ""
@@ -690,16 +635,16 @@ if show_cta: home_content += f'<section style="background:var(--s); color:white;
 c1, c2 = st.columns([3, 1])
 with c1:
     prev = st.radio("Preview", ["Home", "Product", "Blog Index", "Blog Post", "Booking", "Privacy", "Terms", "Contact"], horizontal=True)
-    if prev == "Home": st.components.v1.html(build_page("Home", home_content), height=600, scrolling=True)
-    elif prev == "Product": st.components.v1.html(build_page("Prod", gen_product_page_content(True)), height=600, scrolling=True)
-    elif prev == "Blog Index": st.components.v1.html(build_page("Blog", gen_blog_index_html()), height=600, scrolling=True)
-    elif prev == "Blog Post": st.components.v1.html(build_page("Post", gen_blog_post_html()), height=600, scrolling=True)
-    elif prev == "Booking": st.components.v1.html(build_page("Book", gen_booking_content()), height=600, scrolling=True)
-    elif prev == "Privacy": st.components.v1.html(build_page("Privacy", f"{gen_inner_header('Privacy')}<div class='container'>{format_text(priv_txt)}</div>"), height=600, scrolling=True)
-    elif prev == "Terms": st.components.v1.html(build_page("Terms", f"{gen_inner_header('Terms')}<div class='container'>{format_text(term_txt)}</div>"), height=600, scrolling=True)
+    if prev == "Home": components.html(build_page("Home", home_content), height=600, scrolling=True)
+    elif prev == "Product": components.html(build_page("Prod", gen_product_page_content(True)), height=600, scrolling=True)
+    elif prev == "Blog Index": components.html(build_page("Blog", gen_blog_index_html()), height=600, scrolling=True)
+    elif prev == "Blog Post": components.html(build_page("Post", gen_blog_post_html()), height=600, scrolling=True)
+    elif prev == "Booking": components.html(build_page("Book", gen_booking_content()), height=600, scrolling=True)
+    elif prev == "Privacy": components.html(build_page("Privacy", f"{gen_inner_header('Privacy')}<div class='container'>{format_text(priv_txt)}</div>"), height=600, scrolling=True)
+    elif prev == "Terms": components.html(build_page("Terms", f"{gen_inner_header('Terms')}<div class='container'>{format_text(term_txt)}</div>"), height=600, scrolling=True)
     elif prev == "Contact": 
         contact_html = f"""{gen_inner_header("Contact Us")}<section><div class="container"><div class="contact-grid"><div><div class="card"><h3>Get In Touch</h3><p>{biz_addr}</p><p><a href="tel:{biz_phone}">{biz_phone}</a></p><p>{biz_email}</p></div></div><div class="card"><h3>Send Message</h3><form action="https://formsubmit.co/{biz_email}" method="POST"><label>Name</label><input type="text" name="name" required><label>Email</label><input type="email" name="email" required><label>Message</label><textarea name="msg" rows="4" required></textarea><button class="btn btn-primary" type="submit">Send</button></form></div></div><br><div style="border-radius:12px;overflow:hidden;">{map_iframe}</div></div></section>"""
-        st.components.v1.html(build_page("Contact", contact_html), height=600, scrolling=True)
+        components.html(build_page("Contact", contact_html), height=600, scrolling=True)
 
 with c2:
     if st.button("DOWNLOAD WEBSITE ZIP", type="primary"):
