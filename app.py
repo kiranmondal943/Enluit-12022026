@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components  # <--- FIXED IMPORT
 import zipfile
 import io
 import json
@@ -19,7 +20,7 @@ init_state('feat_data', "bolt | The Performance Pillar | **0.1s High-Velocity Lo
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v40.2 | Stable Release", 
+    page_title="Titan v40.3 | Final Fixed", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -28,10 +29,10 @@ st.set_page_config(
 # --- 2. SIDEBAR ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v40.2 | Final Fixed Build")
+    st.caption("v40.3 | Variable Fix Applied")
     st.divider()
     
-    # AI
+    # AI GENERATOR
     with st.expander("🤖 Titan AI Generator", expanded=False):
         groq_key = st.text_input("Groq API Key", type="password")
         biz_desc = st.text_input("Business Description")
@@ -49,7 +50,7 @@ with st.sidebar:
                     st.success("Generated! Refresh page.")
                 except: st.error("AI Error")
 
-    # DESIGN
+    # DESIGN STUDIO
     with st.expander("🎨 Visual DNA", expanded=True):
         theme_mode = st.selectbox("Base Theme", ["Clean Corporate", "Midnight SaaS", "Glassmorphism", "Cyberpunk Neon", "Luxury Gold", "Stark Minimalist"])
         c1, c2 = st.columns(2)
@@ -81,7 +82,7 @@ with st.sidebar:
         gsc_tag = st.text_input("Google Verification")
         og_image = st.text_input("Social Share Image")
 
-# --- 3. INPUTS ---
+# --- 3. INPUT TABS ---
 st.title("🏗️ StopWebRent Site Builder")
 tabs = st.tabs(["1. Identity", "2. Content", "3. Pricing", "4. Store", "5. Booking", "6. Blog", "7. Legal"])
 
@@ -222,14 +223,23 @@ def gen_csv_parser():
     """
 
 def get_theme_css():
-    bg, txt, card, nav = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
-    if "Midnight" in theme_mode: bg, txt, card, nav = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
+    # --- FIX: RENAMED VARIABLES TO PREVENT NAME ERROR ---
+    bg_color, text_color, card_bg, nav_bg = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
+    
+    if "Midnight" in theme_mode: 
+        bg_color, text_color, card_bg, nav_bg = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
+    if "Cyberpunk" in theme_mode: 
+        bg_color, text_color, card_bg, nav_bg = "#050505", "#00ff9d", "rgba(10,10,10,0.9)", "rgba(0,0,0,0.9)"
+    if "Luxury" in theme_mode: 
+        bg_color, text_color, card_bg, nav_bg = "#101010", "#D4AF37", "rgba(20,20,20,0.9)", "rgba(0,0,0,0.9)"
+    if "Stark" in theme_mode:
+        bg_color, text_color, card_bg, nav_bg = "#ffffff", "#000000", "#ffffff", "rgba(255,255,255,1)"
     
     anim_css = ".reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; } .reveal.active { opacity: 1; transform: translateY(0); }"
     if anim_type == "None": anim_css = ""
 
     return f"""
-    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg}; --txt: {txt}; --card: {card}; --nav: {nav}; --radius: {border_rad}; }}
+    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg_color}; --txt: {text_color}; --card: {card_bg}; --nav: {nav_bg}; --radius: {border_rad}; }}
     * {{ box-sizing: border-box; }}
     html {{ scroll-behavior: smooth; font-size: 16px; }}
     body {{ background-color: var(--bg); color: var(--txt); font-family: var(--b-font); margin: 0; line-height: 1.6; overflow-x: hidden; }}
