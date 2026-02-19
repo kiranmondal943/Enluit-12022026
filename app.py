@@ -1,11 +1,11 @@
 import streamlit as st
-import streamlit.components.v1 as components  # <--- FIXED IMPORT
 import zipfile
 import io
 import json
 import datetime
 import re
 import requests
+import streamlit.components.v1 as components
 
 # --- 0. STATE MANAGEMENT ---
 def init_state(key, default_val):
@@ -20,7 +20,7 @@ init_state('feat_data', "bolt | The Performance Pillar | **0.1s High-Velocity Lo
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v40.3 | Final Fixed", 
+    page_title="Titan v40.2 | Stable Release", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -29,10 +29,10 @@ st.set_page_config(
 # --- 2. SIDEBAR ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v40.3 | Variable Fix Applied")
+    st.caption("v40.2 | Final Fixed Build")
     st.divider()
     
-    # AI GENERATOR
+    # AI
     with st.expander("🤖 Titan AI Generator", expanded=False):
         groq_key = st.text_input("Groq API Key", type="password")
         biz_desc = st.text_input("Business Description")
@@ -50,7 +50,7 @@ with st.sidebar:
                     st.success("Generated! Refresh page.")
                 except: st.error("AI Error")
 
-    # DESIGN STUDIO
+    # DESIGN
     with st.expander("🎨 Visual DNA", expanded=True):
         theme_mode = st.selectbox("Base Theme", ["Clean Corporate", "Midnight SaaS", "Glassmorphism", "Cyberpunk Neon", "Luxury Gold", "Stark Minimalist"])
         c1, c2 = st.columns(2)
@@ -82,7 +82,7 @@ with st.sidebar:
         gsc_tag = st.text_input("Google Verification")
         og_image = st.text_input("Social Share Image")
 
-# --- 3. INPUT TABS ---
+# --- 3. INPUTS ---
 st.title("🏗️ StopWebRent Site Builder")
 tabs = st.tabs(["1. Identity", "2. Content", "3. Pricing", "4. Store", "5. Booking", "6. Blog", "7. Legal"])
 
@@ -150,10 +150,14 @@ with tabs[3]:
 with tabs[4]:
     booking_embed = st.text_area("Calendly Embed", height=100)
     booking_title = st.text_input("Book Title", "Book Now")
+    # FIX: Added missing variable
+    booking_desc = st.text_area("Booking Description", "Schedule a time with our experts.") 
 
 with tabs[5]:
     blog_sheet_url = st.text_input("Blog CSV")
     blog_hero_title = st.text_input("Blog Title", "Insights")
+    # FIX: Added missing variable
+    blog_hero_sub = st.text_input("Blog Subtitle", "Latest news and updates from the team.")
 
 with tabs[6]:
     testi_data = st.text_area("Testimonials", "Name | Quote", height=100)
@@ -223,23 +227,14 @@ def gen_csv_parser():
     """
 
 def get_theme_css():
-    # --- FIX: RENAMED VARIABLES TO PREVENT NAME ERROR ---
-    bg_color, text_color, card_bg, nav_bg = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
-    
-    if "Midnight" in theme_mode: 
-        bg_color, text_color, card_bg, nav_bg = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
-    if "Cyberpunk" in theme_mode: 
-        bg_color, text_color, card_bg, nav_bg = "#050505", "#00ff9d", "rgba(10,10,10,0.9)", "rgba(0,0,0,0.9)"
-    if "Luxury" in theme_mode: 
-        bg_color, text_color, card_bg, nav_bg = "#101010", "#D4AF37", "rgba(20,20,20,0.9)", "rgba(0,0,0,0.9)"
-    if "Stark" in theme_mode:
-        bg_color, text_color, card_bg, nav_bg = "#ffffff", "#000000", "#ffffff", "rgba(255,255,255,1)"
+    bg, txt, card, nav = "#ffffff", "#0f172a", "rgba(255,255,255,0.8)", "rgba(255,255,255,0.9)"
+    if "Midnight" in theme_mode: bg, txt, card, nav = "#0f172a", "#f8fafc", "rgba(30,41,59,0.9)", "rgba(15,23,42,0.9)"
     
     anim_css = ".reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; } .reveal.active { opacity: 1; transform: translateY(0); }"
     if anim_type == "None": anim_css = ""
 
     return f"""
-    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg_color}; --txt: {text_color}; --card: {card_bg}; --nav: {nav_bg}; --radius: {border_rad}; }}
+    :root {{ --p: {p_color}; --s: {s_color}; --bg: {bg}; --txt: {txt}; --card: {card}; --nav: {nav}; --radius: {border_rad}; --h-font: '{h_font}', sans-serif; --b-font: '{b_font}', sans-serif; }}
     * {{ box-sizing: border-box; }}
     html {{ scroll-behavior: smooth; font-size: 16px; }}
     body {{ background-color: var(--bg); color: var(--txt); font-family: var(--b-font); margin: 0; line-height: 1.6; overflow-x: hidden; }}
@@ -614,6 +609,68 @@ def gen_product_page_content(is_demo=False):
 
 def gen_inner_header(title):
     return f"""<section class="hero" style="min-height: 40vh; background:var(--p);"><div class="container"><h1>{title}</h1></div></section>"""
+
+# --- FIX: THE MISSING ASSEMBLER FUNCTION ---
+def build_page(title, content):
+    # 1. Fonts Link
+    fonts_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@400;700&family=Oswald&family=Open+Sans&family=Roboto&family=Space+Grotesk&display=swap"
+    
+    # 2. Navigation Construction
+    nav_links_html = f"""<a href="index.html">Home</a>"""
+    if show_pricing: nav_links_html += f"""<a href="#pricing">Pricing</a>"""
+    if show_inventory: nav_links_html += f"""<a href="product.html">Store</a>"""
+    if show_blog: nav_links_html += f"""<a href="blog.html">Blog</a>"""
+    nav_links_html += f"""<a href="contact.html">Contact</a>"""
+    
+    # 3. HTML Skeleton
+    return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{title} | {biz_name}</title>
+        <meta name="description" content="{seo_d}">
+        <link href="{fonts_url}" rel="stylesheet">
+        <style>{get_theme_css()}</style>
+        {gen_schema()}
+    </head>
+    <body>
+        <nav>
+            <div class="container nav-flex">
+                <a href="index.html" style="font-size:1.5rem; font-weight:bold; text-decoration:none; color:var(--txt);">{biz_name}</a>
+                <div class="mobile-menu" onclick="toggleMenu()">☰</div>
+                <div class="nav-links">
+                    {nav_links_html}
+                    <div style="display:inline-block; margin-left:2rem; cursor:pointer;" onclick="toggleCart()">
+                        🛒 <span id="cart-count" style="background:var(--s); color:white; padding:2px 6px; border-radius:50%; font-size:0.8rem;">0</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Cart Modal -->
+        <div id="cart-overlay" onclick="toggleCart()"></div>
+        <div id="cart-modal">
+            <h3>Your Cart</h3>
+            <div id="cart-items"></div>
+            <div style="margin-top:1rem; border-top:1px solid #eee; padding-top:1rem; display:flex; justify-content:space-between; font-weight:bold;">
+                <span>Total</span>
+                <span id="cart-total">0.00</span>
+            </div>
+            <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="checkoutWhatsApp()">Checkout on WhatsApp</button>
+        </div>
+        <div id="cart-float" onclick="checkoutWhatsApp()" style="display:none;">
+            <span>💬 Checkout</span>
+        </div>
+
+        {content}
+        
+        {gen_footer()}
+        {gen_common_js()}
+    </body>
+    </html>
+    """
 
 # --- 6. ASSEMBLE HOME ---
 home_content = ""
